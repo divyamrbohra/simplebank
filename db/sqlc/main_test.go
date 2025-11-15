@@ -4,13 +4,10 @@ import (
 	"context"
 	"log"
 	"os"
+	"simplebank/util"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-)
-
-const (
-	dbSource = "postgresql://divymbohra:divymbohra@localhost:5432/simplebank?sslmode=disable"
 )
 
 var testQueries *Queries
@@ -21,10 +18,13 @@ func TestDummy(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	var err error
+	config, err := util.LoadConfig("../..")
+	if err != nil {
+		log.Fatal("Cannot load Config:", err)
+	}
 
 	// Correctly using pgxpool.Connect to create a connection pool
-	testDB, err = pgxpool.New(context.Background(), dbSource)
+	testDB, err = pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Printf("❌ failed to connect to DB: %v", err)
 		log.Fatal("cannot connect to db:", err)

@@ -1,9 +1,14 @@
 package util
 
 import (
+	"fmt"
 	"math/rand"
+	db "simplebank/db/sqlc"
 	"strings"
+	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -36,8 +41,30 @@ func RandomMoney() int64 {
 	return RandomInt(0, 1000)
 }
 
+func RandomUsername() string {
+	return RandomString(6)
+}
+
 func RandomCurrency() string {
-	currencies := []string{"EUR", "USD", "CAD"}
+	currencies := []string{EUR, USD, CAD, INR}
 	n := len(currencies)
 	return currencies[rand.Intn(n)]
+}
+
+func RandomEmail() string {
+	return fmt.Sprintf("%s@email.com", RandomString(6))
+}
+
+func randomUser(t *testing.T) (user db.User, password string) {
+	password = RandomString(6)
+	hashedPassword, err := HashPassword(password)
+	require.NoError(t, err)
+
+	user = db.User{
+		Username:       RandomOwner(),
+		HashedPassword: hashedPassword,
+		FullName:       RandomOwner(),
+		Email:          RandomEmail(),
+	}
+	return
 }
